@@ -1667,7 +1667,22 @@ export default function (this: any): Interfaces.State {
   });
   connection.onMessage('TPN', data => {
     const conv = state.privateMap[data.character.toLowerCase()];
-    if (conv !== undefined) conv.typingStatus = data.status;
+    if (conv !== undefined)
+    {
+      conv.typingStatus = data.status;
+    }
+    else
+    {
+      const char = core.character.get(data.characters);
+
+      const message = createMessage(MessageType.Message, char, Text, new Date());
+
+      EventBus.$emit('private message', { message});
+
+      const conv2 = state.getPrivate(char);
+      conv2.typingStatus = data.status;
+    }
+    
   });
   connection.onMessage('CBU', async (data, time) => {
     const conv = state.channelMap[data.channel.toLowerCase()];
